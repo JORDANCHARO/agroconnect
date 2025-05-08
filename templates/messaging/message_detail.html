@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ message.subject }} - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card animate__animated animate__fadeIn">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>{{ message.subject }}
+                    </h4>
+                    <div>
+                        <a href="{% url 'inbox' %}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="message-header mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">
+                                {% if message.sender == request.user %}
+                                    <i class="fas fa-paper-plane text-success me-2"></i>Envoyé à {{ message.receiver.username }}
+                                {% else %}
+                                    <i class="fas fa-user text-primary me-2"></i>De {{ message.sender.username }}
+                                {% endif %}
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>{{ message.created_at|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                        {% if message.sender != request.user %}
+                            <a href="{% url 'send_message' %}?reply_to={{ message.id }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-reply me-2"></i>Répondre
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="message-content p-3 bg-light rounded">
+                    {{ message.content|linebreaks }}
+                </div>
+
+                {% if message.attachments.exists %}
+                    <div class="message-attachments mt-4">
+                        <h6 class="mb-3">
+                            <i class="fas fa-paperclip me-2"></i>Pièces jointes
+                        </h6>
+                        <div class="list-group">
+                            {% for attachment in message.attachments.all %}
+                                <a href="{{ attachment.file.url }}" class="list-group-item list-group-item-action" target="_blank">
+                                    <i class="fas fa-file me-2"></i>{{ attachment.filename }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

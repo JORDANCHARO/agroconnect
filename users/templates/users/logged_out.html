@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Déconnexion - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card animate__animated animate__fadeIn">
+            <div class="card-body p-4 text-center">
+                <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                <h2 class="mb-4">Déconnexion réussie</h2>
+                <p class="mb-4">Vous avez été déconnecté avec succès.</p>
+                <a href="{% url 'login' %}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Se reconnecter
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

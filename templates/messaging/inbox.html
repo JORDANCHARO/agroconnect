@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Boîte de réception - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>
+            <i class="fas fa-inbox me-2"></i>Boîte de réception
+        </h2>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'send_message' %}" class="btn btn-primary">
+            <i class="fas fa-pen me-2"></i>Nouveau message
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Messages reçus -->
+    <div class="col-md-6 mb-4">
+        <div class="card animate__animated animate__fadeInLeft">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-inbox me-2"></i>Messages reçus
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if received_messages %}
+                    <div class="list-group list-group-flush">
+                        {% for message in received_messages %}
+                            <a href="{% url 'message_detail' message.pk %}" class="list-group-item list-group-item-action {% if not message.is_read %}fw-bold{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ message.subject }}</h6>
+                                    <small>{{ message.created_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                <p class="mb-1 text-muted">
+                                    <i class="fas fa-user me-1"></i>{{ message.sender.username }}
+                                </p>
+                                <small class="text-muted">
+                                    {{ message.content|truncatechars:100 }}
+                                </small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center p-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucun message reçu</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Messages envoyés -->
+    <div class="col-md-6 mb-4">
+        <div class="card animate__animated animate__fadeInRight">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-paper-plane me-2"></i>Messages envoyés
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if sent_messages %}
+                    <div class="list-group list-group-flush">
+                        {% for message in sent_messages %}
+                            <a href="{% url 'message_detail' message.pk %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ message.subject }}</h6>
+                                    <small>{{ message.created_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                <p class="mb-1 text-muted">
+                                    <i class="fas fa-user me-1"></i>{{ message.receiver.username }}
+                                </p>
+                                <small class="text-muted">
+                                    {{ message.content|truncatechars:100 }}
+                                </small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center p-4">
+                        <i class="fas fa-paper-plane fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucun message envoyé</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

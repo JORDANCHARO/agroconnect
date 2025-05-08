@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>
+            <i class="fas fa-chart-line me-2"></i>Tableau de bord
+        </h2>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white animate__animated animate__fadeIn">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-handshake me-2"></i>Partenariats
+                </h5>
+                <h2 class="mb-0">{{ partnership_count }}</h2>
+                <small>Partenariats actifs</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white animate__animated animate__fadeIn">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-box me-2"></i>Produits
+                </h5>
+                <h2 class="mb-0">{{ product_count }}</h2>
+                <small>Produits en stock</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white animate__animated animate__fadeIn">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-envelope me-2"></i>Messages
+                </h5>
+                <h2 class="mb-0">{{ unread_messages }}</h2>
+                <small>Messages non lus</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white animate__animated animate__fadeIn">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-calendar me-2"></i>Événements
+                </h5>
+                <h2 class="mb-0">{{ upcoming_events }}</h2>
+                <small>Événements à venir</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Galerie et Carte -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card animate__animated animate__fadeInLeft">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-images me-2"></i>Galerie de la ferme
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="farmCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for photo in profile.farm_photos.all %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ photo.url }}" class="d-block w-100" alt="Photo de la ferme">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#farmCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#farmCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card animate__animated animate__fadeInRight">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-map-marker-alt me-2"></i>Localisation
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="map" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Calendrier et Produits -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card animate__animated animate__fadeInLeft">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Calendrier de production
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card animate__animated animate__fadeInRight">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-box me-2"></i>Gestion des stocks
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Unité</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                                <tr>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.quantity }}</td>
+                                    <td>{{ product.unit }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+<script>
+    // Initialisation de la carte
+    function initMap() {
+        const location = { lat: {{ profile.latitude }}, lng: {{ profile.longitude }} };
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 15,
+            center: location,
+        });
+        new google.maps.Marker({
+            position: location,
+            map: map,
+        });
+    }
+
+    // Initialisation du calendrier
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: [
+                {% for event in events %}
+                    {
+                        title: '{{ event.title }}',
+                        start: '{{ event.start_date|date:"Y-m-d" }}',
+                        end: '{{ event.end_date|date:"Y-m-d" }}'
+                    },
+                {% endfor %}
+            ]
+        });
+        calendar.render();
+    });
+
+    // Initialisation de la carte
+    initMap();
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+{% endblock %} 

@@ -1,0 +1,205 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card.primary {
+        border-left: 4px solid #007bff;
+    }
+    
+    .stat-card.success {
+        border-left: 4px solid #28a745;
+    }
+    
+    .stat-card.info {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .stat-card.warning {
+        border-left: 4px solid #ffc107;
+    }
+    
+    .stat-card .icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card .title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .subtitle {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .recent-activity {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .recent-activity h2 {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        color: #343a40;
+    }
+    
+    .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .activity-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-item .time {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="dashboard-stats">
+        <!-- Utilisateurs -->
+        <div class="stat-card primary">
+            <div class="icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="title">Utilisateurs</div>
+            <div class="value">{{ stats.users.total }}</div>
+            <div class="subtitle">
+                {{ stats.users.producers }} producteurs / {{ stats.users.processors }} transformateurs
+            </div>
+        </div>
+        
+        <!-- Profils -->
+        <div class="stat-card success">
+            <div class="icon">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div class="title">Profils</div>
+            <div class="value">{{ stats.profiles.producer_profiles|add:stats.profiles.processor_profiles }}</div>
+            <div class="subtitle">
+                {{ stats.profiles.producer_profiles }} fermes / {{ stats.profiles.processor_profiles }} entreprises
+            </div>
+        </div>
+        
+        <!-- Produits -->
+        <div class="stat-card info">
+            <div class="icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="title">Produits</div>
+            <div class="value">{{ stats.products.total }}</div>
+            <div class="subtitle">
+                {{ stats.products.available }} disponibles
+            </div>
+        </div>
+        
+        <!-- Messages -->
+        <div class="stat-card warning">
+            <div class="icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="title">Messages</div>
+            <div class="value">{{ stats.messaging.total_messages }}</div>
+            <div class="subtitle">
+                {{ stats.messaging.unread_messages }} non lus
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="recent-activity">
+                <h2>
+                    <i class="fas fa-clock me-2"></i>Activité récente
+                </h2>
+                <ul class="activity-list">
+                    {% for user in recent_users %}
+                    <li class="activity-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>{{ user.username }}</strong>
+                                <span class="text-muted">s'est inscrit</span>
+                            </div>
+                            <div class="time">{{ user.date_joined|timesince }}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="recent-activity">
+                <h2>
+                    <i class="fas fa-handshake me-2"></i>Partenariats
+                </h2>
+                <ul class="activity-list">
+                    {% for request in recent_partnerships %}
+                    <li class="activity-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>{{ request.sender.username }}</strong>
+                                <span class="text-muted">→</span>
+                                <strong>{{ request.receiver.username }}</strong>
+                                <span class="badge {% if request.status == 'accepted' %}bg-success{% elif request.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="time">{{ request.created_at|timesince }}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

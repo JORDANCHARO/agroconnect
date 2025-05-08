@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Inscription - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card animate__animated animate__fadeIn">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-user-plus me-2"></i>Inscription
+                </h2>
+                
+                <form method="post" class="needs-validation" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.username|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.password1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.password2|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.user_type|as_crispy_field }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.phone_number|as_crispy_field }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.address|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Documents requis pour tous les utilisateurs -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-id-card me-2"></i>Documents d'identité requis
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                {{ form.identity_document|as_crispy_field }}
+                                <small class="text-muted">Format accepté : PDF, JPG, JPEG, PNG</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Documents spécifiques aux producteurs -->
+                    <div id="producer-documents" class="card mb-3" style="display: none;">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tractor me-2"></i>Documents spécifiques aux producteurs
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                {{ form.land_title|as_crispy_field }}
+                                <small class="text-muted">Titre foncier ou document prouvant la propriété/exploitation des terres</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Documents spécifiques aux transformateurs -->
+                    <div id="processor-documents" class="card mb-3" style="display: none;">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-industry me-2"></i>Documents spécifiques aux transformateurs
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                {{ form.business_registration|as_crispy_field }}
+                                <small class="text-muted">Extrait Kbis ou document d'enregistrement de l'entreprise</small>
+                            </div>
+                            <div class="mb-3">
+                                {{ form.tax_registration|as_crispy_field }}
+                                <small class="text-muted">Numéro d'identification fiscale</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>S'inscrire
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0">Déjà inscrit ?</p>
+                    <a href="{% url 'login' %}" class="btn btn-link">Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+    // Afficher/masquer les documents selon le type d'utilisateur
+    document.addEventListener('DOMContentLoaded', function() {
+        const userTypeSelect = document.querySelector('#id_user_type');
+        const producerDocs = document.querySelector('#producer-documents');
+        const processorDocs = document.querySelector('#processor-documents');
+
+        function updateDocumentSections() {
+            const selectedType = userTypeSelect.value;
+            producerDocs.style.display = selectedType === 'producer' ? 'block' : 'none';
+            processorDocs.style.display = selectedType === 'processor' ? 'block' : 'none';
+        }
+
+        userTypeSelect.addEventListener('change', updateDocumentSections);
+        updateDocumentSections(); // Initial state
+    });
+</script>
+{% endblock %} 

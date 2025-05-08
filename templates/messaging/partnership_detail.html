@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails du partenariat - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card animate__animated animate__fadeIn">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-handshake me-2"></i>Détails du partenariat
+                    </h4>
+                    <div>
+                        <a href="{% url 'partnership_requests' %}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-user me-2"></i>Producteur</h5>
+                        <p>{{ partnership.producer.username }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-industry me-2"></i>Transformateur</h5>
+                        <p>{{ partnership.processor.username }}</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5><i class="fas fa-info-circle me-2"></i>Description</h5>
+                    <p>{{ partnership.description }}</p>
+                </div>
+
+                {% if partnership.terms %}
+                <div class="mb-4">
+                    <h5><i class="fas fa-file-contract me-2"></i>Conditions</h5>
+                    <p>{{ partnership.terms }}</p>
+                </div>
+                {% endif %}
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-calendar me-2"></i>Date de début</h5>
+                        <p>{{ partnership.start_date|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-tag me-2"></i>Statut</h5>
+                        <span class="badge {% if partnership.status == 'active' %}bg-success{% elif partnership.status == 'suspended' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ partnership.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                {% if partnership.status == 'active' %}
+                <div class="d-grid gap-2">
+                    <a href="{% url 'send_message_to' partnership.processor.id %}" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Envoyer un message
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

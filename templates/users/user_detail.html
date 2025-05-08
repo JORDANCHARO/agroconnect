@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil de {{ user.username }} - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>
+            <i class="fas fa-user me-2"></i>Profil de {{ user.username }}
+        </h2>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'user_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card animate__animated animate__fadeInLeft">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Informations personnelles
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6><i class="fas fa-user me-2"></i>Nom d'utilisateur</h6>
+                    <p>{{ user.username }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-envelope me-2"></i>Email</h6>
+                    <p>{{ user.email }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-tag me-2"></i>Type d'utilisateur</h6>
+                    <p>{{ user.get_user_type_display }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-phone me-2"></i>Téléphone</h6>
+                    <p>{{ user.phone_number|default:"Non renseigné" }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-map-marker-alt me-2"></i>Adresse</h6>
+                    <p>{{ user.address|default:"Non renseignée" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card animate__animated animate__fadeInRight">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Statistiques
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6><i class="fas fa-calendar me-2"></i>Date d'inscription</h6>
+                    <p>{{ user.date_joined|date:"d/m/Y" }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-clock me-2"></i>Dernière connexion</h6>
+                    <p>{{ user.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</p>
+                </div>
+                
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'send_message_to' user.pk %}" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Envoyer un message
+                    </a>
+                    {% if user.user_type != request.user.user_type %}
+                        <a href="{% url 'send_partnership_request' user.pk %}" class="btn btn-outline-success">
+                            <i class="fas fa-handshake me-2"></i>Proposer un partenariat
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

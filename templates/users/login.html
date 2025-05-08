@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Connexion - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card animate__animated animate__fadeIn">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-sign-in-alt me-2"></i>Connexion
+                </h2>
+                
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Nom d'utilisateur</label>
+                        <input type="text" name="username" id="id_username" class="form-control" required>
+                        <div class="invalid-feedback">
+                            Veuillez entrer votre nom d'utilisateur.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Mot de passe</label>
+                        <input type="password" name="password" id="id_password" class="form-control" required>
+                        <div class="invalid-feedback">
+                            Veuillez entrer votre mot de passe.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0">Pas encore de compte ?</p>
+                    <a href="{% url 'register' %}" class="btn btn-link">Créer un compte</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %} 

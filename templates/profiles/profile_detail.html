@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profil - AgroConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Informations du profil -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <!-- Photo de profil -->
+                    <div class="mb-4">
+                        {% if user.profile_photo %}
+                            <img src="{{ user.profile_photo.url }}" 
+                                 alt="Photo de profil" 
+                                 class="rounded-circle img-thumbnail"
+                                 style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto"
+                                 style="width: 150px; height: 150px;">
+                                <i class="fas fa-user fa-4x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <h4 class="card-title mb-4">
+                        {% if user.user_type == 'producer' %}
+                            Profil Producteur
+                        {% else %}
+                            Profil Transformateur
+                        {% endif %}
+                    </h4>
+                    
+                    <h5 class="text-primary">
+                        {% if user.user_type == 'producer' %}
+                            {{ producer_profile.farm_name }}
+                        {% else %}
+                            {{ processor_profile.company_name }}
+                        {% endif %}
+                    </h5>
+                    
+                    <p class="text-muted">
+                        <i class="fas fa-user me-2"></i>{{ user.get_full_name|default:user.username }}
+                    </p>
+                    
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {% if user.user_type == 'producer' %}
+                            {{ producer_profile.location }}
+                        {% else %}
+                            {{ processor_profile.location }}
+                        {% endif %}
+                    </p>
+
+                    {% if user.user_type == 'processor' %}
+                        <div class="mt-3">
+                            <p class="mb-2">
+                                <strong><i class="fas fa-industry me-2"></i>Capacité de transformation:</strong><br>
+                                {{ processor_profile.transformation_capacity }}
+                            </p>
+                            <p class="mb-2">
+                                <strong><i class="fas fa-box me-2"></i>Produits transformés:</strong><br>
+                                {{ processor_profile.transformed_products|linebreaks }}
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    {% if user.user_type == 'producer' and producer_profile.certification_documents %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-certificate"></i> Certifié
+                        </div>
+                    {% elif user.user_type == 'processor' and processor_profile.certification_documents %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-certificate"></i> Certifié
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire d'édition -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Modifier le profil</h4>
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        <!-- Photo de profil -->
+                        <div class="mb-4">
+                            <label class="form-label">Photo de profil</label>
+                            <div class="d-flex align-items-center">
+                                {% if user.profile_photo %}
+                                    <img src="{{ user.profile_photo.url }}" 
+                                         alt="Photo de profil actuelle" 
+                                         class="rounded-circle me-3"
+                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                {% endif %}
+                                <input type="file" name="profile_photo" class="form-control" accept="image/*">
+                            </div>
+                            <small class="text-muted">Format recommandé : JPG ou PNG, max 2MB</small>
+                        </div>
+
+                        {% if user.user_type == 'producer' %}
+                            {{ form.farm_name|as_crispy_field }}
+                            {{ form.farm_description|as_crispy_field }}
+                            {{ form.location|as_crispy_field }}
+                            {{ form.latitude|as_crispy_field }}
+                            {{ form.longitude|as_crispy_field }}
+                            {{ form.certification_documents|as_crispy_field }}
+                        {% else %}
+                            {{ form.company_name|as_crispy_field }}
+                            {{ form.company_description|as_crispy_field }}
+                            {{ form.location|as_crispy_field }}
+                            {{ form.certification_documents|as_crispy_field }}
+                            <div class="form-group">
+                                <label for="id_transformation_capacity" class="form-label">Capacité de transformation</label>
+                                {{ form.transformation_capacity }}
+                                <small class="form-text text-muted">Ex: 1000 tonnes/an</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_transformed_products" class="form-label">Produits transformés</label>
+                                {{ form.transformed_products }}
+                                <small class="form-text text-muted">Listez vos produits transformés (un par ligne)</small>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Enregistrer les modifications
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if user.user_type == 'producer' %}
+                <!-- Photos des plantations -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-seedling"></i> Photos des plantations
+                        </h4>
+                        <form method="post" action="{% url 'upload_producer_photo' %}" enctype="multipart/form-data" class="mb-4">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select name="photo_type" class="form-select mb-3" required>
+                                        <option value="plantation">Plantation</option>
+                                        <option value="crop">Culture</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" name="description" class="form-control mb-3" placeholder="Description de la photo">
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="file" name="image" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-upload"></i> Ajouter une photo
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            {% for photo in producer_profile.photos.all %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <img src="{{ photo.image.url }}" 
+                                         class="card-img-top" 
+                                         alt="Photo de plantation"
+                                         style="height: 200px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ photo.get_photo_type_display }}</h6>
+                                        <p class="card-text text-muted">
+                                            <small>{{ photo.description|default:"Photo de plantation" }}</small>
+                                        </p>
+                                        <form method="post" action="{% url 'delete_producer_photo' photo.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <p class="text-muted">Aucune photo de plantation n'a été ajoutée.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if user.user_type == 'processor' %}
+                <!-- Photos des installations -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-industry"></i> Photos des installations
+                        </h4>
+                        <form method="post" action="{% url 'upload_facility_photo' %}" enctype="multipart/form-data" class="mb-4">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="file" name="image" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-upload"></i> Ajouter une photo
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            {% for photo in processor_profile.facility_photos.all %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <img src="{{ photo.image.url }}" 
+                                         class="card-img-top" 
+                                         alt="Photo d'installation"
+                                         style="height: 200px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <p class="card-text text-muted">
+                                            <small>{{ photo.description|default:"Photo d'installation" }}</small>
+                                        </p>
+                                        <form method="post" action="{% url 'delete_facility_photo' photo.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <p class="text-muted">Aucune photo d'installation n'a été ajoutée.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photos des plantations -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-seedling"></i> Photos des plantations
+                        </h4>
+                        <form method="post" action="{% url 'upload_plantation_photo' %}" enctype="multipart/form-data" class="mb-4">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="file" name="image" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-upload"></i> Ajouter une photo
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            {% for photo in processor_profile.plantation_photos.all %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <img src="{{ photo.image.url }}" 
+                                         class="card-img-top" 
+                                         alt="Photo de plantation"
+                                         style="height: 200px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <p class="card-text text-muted">
+                                            <small>{{ photo.description|default:"Photo de plantation" }}</small>
+                                        </p>
+                                        <form method="post" action="{% url 'delete_plantation_photo' photo.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <p class="text-muted">Aucune photo de plantation n'a été ajoutée.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %} 

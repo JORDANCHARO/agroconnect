@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Tableau de bord du transformateur</h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Section Profil -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Profil de l'entreprise</h3>
+                </div>
+                <div class="card-body">
+                    <h4>{{ profile.company_name }}</h4>
+                    <p>{{ profile.company_description }}</p>
+                    <p><strong>Localisation:</strong> {{ profile.location }}</p>
+                    <a href="{% url 'profile_edit' %}" class="btn btn-primary">Modifier le profil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Partenariats actifs</h5>
+                    <p class="card-text display-4">{{ partnership_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Messages non lus</h5>
+                    <p class="card-text display-4">{{ unread_messages }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Actions rapides -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Actions rapides</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{% url 'profile_list' %}" class="btn btn-success btn-lg btn-block mb-2">
+                                <i class="fas fa-search"></i> Rechercher des producteurs
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'inbox' %}" class="btn btn-info btn-lg btn-block mb-2">
+                                <i class="fas fa-envelope"></i> Voir mes messages
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'partnership_requests' %}" class="btn btn-warning btn-lg btn-block mb-2">
+                                <i class="fas fa-handshake"></i> Gérer les partenariats
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

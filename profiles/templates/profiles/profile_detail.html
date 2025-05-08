@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if user.user_type == 'producer' %}
+        Profil Producteur - AgroConnect
+    {% else %}
+        Profil Transformateur - AgroConnect
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card animate__animated animate__fadeIn">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        {% if user.user_type == 'producer' %}
+                            <i class="fas fa-tractor me-2"></i>Profil Producteur
+                        {% else %}
+                            <i class="fas fa-industry me-2"></i>Profil Transformateur
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                            </button>
+                            <a href="{% url 'profile_detail' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour au profil
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
